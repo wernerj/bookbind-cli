@@ -11,7 +11,8 @@ RSpec.describe Bookbind::PandocAdapter do
   subject(:adapter) { described_class.new(runner:, warnings:) }
 
   it "converts markdown to html" do
-    expect(runner).to receive(:run).with("pandoc", "--from", "markdown", "--to", "html", "in.md").and_return(ok)
+    expect(runner).to receive(:run).with("pandoc", "--from", "markdown-auto_identifiers", "--to", "html",
+                                         "in.md").and_return(ok)
     expect(adapter.markdown_to_html("in.md")).to eq("<p>x</p>")
   end
 

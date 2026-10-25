@@ -11,7 +11,8 @@ module Bookbind
       @parser = parser
     end
 
-    def markdown_to_html(path) = run("--from", "markdown", "--to", "html", path).stdout
+    # Without explicit ids from this step, the EPUB step generates unique ids across all chapters.
+    def markdown_to_html(path) = run("--from", "markdown-auto_identifiers", "--to", "html", path).stdout
 
     def to_epub(chapters:, metadata:, output:)
       run(*EPUB_FLAGS, *metadata_args(metadata), *css_args(metadata), "--output", output, *chapters)
