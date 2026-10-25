@@ -8,15 +8,15 @@ RSpec.describe "Pandoc HTML-to-EPUB behaviour", :requires_pandoc do
   let(:pixel) { fixture("images/pixel.png") }
   let(:data_uri) { "data:image/png;base64,#{[File.binread(pixel)].pack('m0')}" }
 
-  def pandoc_epub(body)
+  def pandoc_epub(body, *flags)
     File.write(File.join(@dir, "in.html"), "<h1>Chapter</h1>#{body}")
-    run_pandoc
+    run_pandoc(*flags)
     EpubInspector.new(File.join(@dir, "out.epub"))
   end
 
-  def run_pandoc
+  def run_pandoc(*flags)
     @stderr = Dir.chdir(@dir) do
-      Bookbind::CommandRunner.new.run("pandoc", "in.html", "-f", "html", "-t", "epub3", "-o", "out.epub").stderr
+      Bookbind::CommandRunner.new.run("pandoc", "in.html", "-f", "html", "-t", "epub3", *flags, "-o", "out.epub").stderr
     end
   end
 
@@ -53,6 +53,12 @@ RSpec.describe "Pandoc HTML-to-EPUB behaviour", :requires_pandoc do
     epub = pandoc_epub('<img src="https://bookbind.invalid/x.png">')
     expect(epub.media).to be_empty
     expect(@stderr).to include("Could not fetch resource https://bookbind.invalid/x.png")
+  end
+
+  it "copies --css files verbatim without embedding images they reference" do
+    File.write(File.join(@dir, "bg.css"), "body { background: url(\"#{pixel}\"); }")
+    epub = pandoc_epub("", "--css", "bg.css")
+    expect([epub.media, epub.read(epub.styles.first)]).to eq([[], "body { background: url(\"#{pixel}\"); }"])
   end
 
   it "drops script, style and stylesheet links from the input" do

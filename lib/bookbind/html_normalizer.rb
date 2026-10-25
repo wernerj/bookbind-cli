@@ -3,7 +3,10 @@
 module Bookbind
   # Parses HTML, lets each step rewrite it, and returns the body as a Chapter.
   class HtmlNormalizer
-    def self.standard = new(steps: [ImagePathRewriter.new, HeadingEnsurer.new])
+    # Links before inline <style>, so the cascade matches the usual document order.
+    def self.standard
+      new(steps: [StylesheetCollector, InlineStyleExtractor, ImagePathRewriter, HeadingEnsurer].map(&:new))
+    end
 
     def initialize(steps:)
       @steps = steps

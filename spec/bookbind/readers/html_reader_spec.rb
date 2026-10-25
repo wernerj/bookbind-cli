@@ -3,7 +3,9 @@
 RSpec.describe Bookbind::HtmlReader do
   subject(:reader) { described_class.new(normalizer: Bookbind::HtmlNormalizer.standard) }
 
-  def read(name) = reader.read(fixture(name), :scratch)
+  around { |example| Dir.mktmpdir { |dir| @scratch = Bookbind::Scratch.new(dir) and example.run } }
+
+  def read(name) = reader.read(fixture(name), @scratch)
 
   def body(name) = Nokogiri::HTML5.fragment(read(name).html)
 
@@ -28,9 +30,25 @@ RSpec.describe Bookbind::HtmlReader do
   it "adds a heading derived from the file name when there is none" do
     Dir.mktmpdir do |dir|
       File.write(File.join(dir, "no_heading.html"), "<p>Just text</p>")
-      chapter = reader.read(File.join(dir, "no_heading.html"), :scratch)
+      chapter = reader.read(File.join(dir, "no_heading.html"), @scratch)
       expect([chapter.html, chapter.title]).to eq(["<h1>no heading</h1><p>Just text</p>", "no heading"])
     end
+  end
+
+  it "discovers linked stylesheets and extracts inline <style> blocks, in that order" do
+    linked, inline = read("page.html").stylesheets
+    expect(linked).to eq(fixture("css/style.css"))
+    expect(File.read(inline)).to include("figure { text-align: center; }")
+  end
+
+  it "keeps no <link> or <style> in the chapter body" do
+    expect(body("page.html").css("link, style")).to be_empty
+  end
+
+  it "warns about a missing stylesheet" do
+    chapter = read("missing_css.html")
+    expect([chapter.stylesheets, chapter.warnings])
+      .to eq([[], ["#{fixture('missing_css.html')}: stylesheet not found: css/nope.css"]])
   end
 
   it "survives malformed markup" do
