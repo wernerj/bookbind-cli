@@ -28,11 +28,12 @@ RSpec.describe "Converting Markdown to EPUB", :requires_pandoc do
     expect(epub.nav_titles).to eq(["Příliš žluťoučký kůň ✓"])
   end
 
-  it "keeps nested headings in one chapter, promoting the first heading instead of adding the file name" do
+  it "lifts a file that starts at h2 to h1 and splits at the lifted h2, without adding the file name" do
     epub = convert("nested_headings.md")
-    expect(epub.chapters.size).to eq(1)
+    expect(epub.chapters.size).to eq(2)
     expect(epub.opf.at("title").text).to eq("Starts at level two")
-    expect(first_chapter(epub).css("h1, h2, h3, h4").map(&:name)).to eq(%w[h1 h3 h4])
+    expect(first_chapter(epub).css("h1, h2, h3, h4").map(&:name)).to eq(%w[h1])
+    expect(epub.xml(epub.chapters.last).css("h1, h2, h3, h4").map(&:name)).to eq(%w[h2 h3])
     expect(epub.nav_titles.first).to eq("Starts at level two")
   end
 end

@@ -18,7 +18,7 @@ RSpec.describe Bookbind::PandocAdapter do
 
   it "builds the exact epub command" do
     expect(runner).to receive(:run).with(
-      "pandoc", "--from", "html", "--to", "epub3", "--split-level=1", "--toc",
+      "pandoc", "--from", "html", "--to", "epub3", "--split-level=2", "--toc",
       "--metadata", "title=T", "--metadata", "author=A", "--metadata", "lang=cs",
       "--css", "/a.css", "--css", "/b.css", "--output", "out.epub", "1.html", "2.html"
     ).and_return(ok)

@@ -3,7 +3,7 @@
 module Bookbind
   # Builds pandoc command lines and runs them.
   class PandocAdapter
-    EPUB_FLAGS = ["--from", "html", "--to", "epub3", "--split-level=1", "--toc"].freeze
+    EPUB_FLAGS = ["--from", "html", "--to", "epub3", "--split-level=2", "--toc"].freeze
 
     def initialize(runner:, warnings:, parser: PandocWarnings)
       @runner = runner

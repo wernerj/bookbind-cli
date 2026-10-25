@@ -11,11 +11,12 @@ RSpec.describe "Combining several inputs into one book", :requires_pandoc do
     EpubInspector.new(output)
   end
 
-  def chapter_headings(epub) = epub.chapters.map { |chapter| epub.xml(chapter).at("h1").text }
+  def chapter_headings(epub) = epub.chapters.map { |chapter| epub.xml(chapter).at("h1, h2").text }
 
-  it "creates one chapter per input, in the order given" do
+  it "creates chapters in the order given, splitting at h1 and h2" do
     epub = epub_for("sample.md", "sample.txt", "page.html", "nested_headings.md")
-    expect(chapter_headings(epub)).to eq(["Markdown Chapter", "sample", "HTML Chapter", "Starts at level two"])
+    expect(chapter_headings(epub))
+      .to eq(["Markdown Chapter", "sample", "HTML Chapter", "Section", "Starts at level two", "Level three"])
     expect(epub.unresolved_references).to be_empty
   end
 
@@ -29,9 +30,9 @@ RSpec.describe "Combining several inputs into one book", :requires_pandoc do
     expect(epub.nav_titles).to eq(["sample", "Markdown Chapter"])
   end
 
-  it "embeds a stylesheet and an image shared by two chapters only once" do
+  it "embeds a stylesheet and an image shared by two inputs only once" do
     epub = epub_for("page.html", "second_page.html")
-    expect([epub.chapters.size, epub.media.size]).to eq([2, 1])
+    expect([epub.chapters.size, epub.media.size]).to eq([3, 1])
     expect(epub.styles.count { |css| epub.read(css).include?(".chapter-title") }).to eq(1)
     expect(epub.unresolved_references).to be_empty
   end

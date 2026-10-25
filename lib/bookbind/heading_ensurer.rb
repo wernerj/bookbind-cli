@@ -1,38 +1,31 @@
 # frozen_string_literal: true
 
 module Bookbind
-  # Pandoc only starts a new EPUB chapter at an <h1>, so every input needs one.
+  # Pandoc only starts a new EPUB chapter at a top-level heading, so every input needs an <h1>.
+  # Without one, the headings move up together so that sibling chapters keep the same level.
   class HeadingEnsurer
     HEADINGS = "h1, h2, h3, h4, h5, h6"
 
     def apply(doc, context)
-      return context.title = first_heading(doc) if doc.at("h1")
+      headings = doc.css(HEADINGS)
+      context.title = title_of(headings.first) || FilenameTitle.for(context.source)
+      return if doc.at("h1")
 
-      heading = leading_heading(doc)
-      heading ? promote(heading, context) : add_from_filename(doc, context)
+      headings.empty? ? add_title(doc, context.title) : lift(headings)
     end
 
     private
 
-    def first_heading(doc) = text_of(doc.at_css(HEADINGS))
-
-    def leading_heading(doc)
-      doc.at_css(HEADINGS) if text_of(doc.at_css(HEADINGS))
-    end
-
-    def promote(heading, context)
-      context.title = text_of(heading)
-      heading.name = "h1"
-    end
-
-    def add_from_filename(doc, context)
-      context.title = FilenameTitle.for(context.source)
-      doc.at("body").prepend_child(doc.create_element("h1", context.title))
-    end
-
-    def text_of(node)
-      text = node&.text.to_s.strip
+    def title_of(heading)
+      text = heading&.text.to_s.strip
       text unless text.empty?
+    end
+
+    def add_title(doc, title) = doc.at("body").prepend_child(doc.create_element("h1", title))
+
+    def lift(headings)
+      shift = headings.map { |heading| heading.name[1].to_i }.min - 1
+      headings.each { |heading| heading.name = "h#{heading.name[1].to_i - shift}" }
     end
   end
 end

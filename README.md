@@ -92,7 +92,7 @@ Every reader produces HTML, because pandoc accepts only one `--from` format for 
 
 After reading, each chapter gets an `<h1>` if it lacks one, so pandoc starts a new chapter at every input file. The heading is derived from the file name.
 
-The EPUB writer runs `pandoc --to epub3 --split-level=1 --toc`, which embeds the images and stylesheets. The MOBI writer builds the EPUB first, then runs `ebook-convert`. Intermediate files live in a temporary directory that is always removed afterwards.
+The EPUB writer runs `pandoc --to epub3 --split-level=2 --toc`, which embeds the images and stylesheets. The MOBI writer builds the EPUB first, then runs `ebook-convert`. Intermediate files live in a temporary directory that is always removed afterwards.
 
 ## Known limitations
 
