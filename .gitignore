@@ -1,0 +1,6 @@
+.env
+/coverage/
+/tmp/
+*.epub
+*.mobi
+.DS_Store
