@@ -17,9 +17,9 @@ RSpec.describe Bookbind::HeadingEnsurer do
     expect(context.title).to eq("the intro")
   end
 
-  it "adds an h1 above lower-level headings but titles the chapter with the first heading" do
-    doc = apply("<h2>Sub</h2>")
-    expect([doc.css("h1, h2").map(&:text), context.title]).to eq([["the intro", "Sub"], "Sub"])
+  it "promotes a leading lower-level heading to h1 instead of adding the file name" do
+    doc = apply("<h2>Sub</h2><p>x</p>")
+    expect([doc.css("h1").map(&:text), doc.css("h2").size, context.title]).to eq([["Sub"], 0, "Sub"])
   end
 
   it "handles an empty body" do

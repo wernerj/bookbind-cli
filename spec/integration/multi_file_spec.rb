@@ -15,7 +15,7 @@ RSpec.describe "Combining several inputs into one book", :requires_pandoc do
 
   it "creates one chapter per input, in the order given" do
     epub = epub_for("sample.md", "sample.txt", "page.html", "nested_headings.md")
-    expect(chapter_headings(epub)).to eq(["Markdown Chapter", "sample", "HTML Chapter", "nested headings"])
+    expect(chapter_headings(epub)).to eq(["Markdown Chapter", "sample", "HTML Chapter", "Starts at level two"])
     expect(epub.unresolved_references).to be_empty
   end
 
