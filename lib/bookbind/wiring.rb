@@ -22,9 +22,9 @@ module Bookbind
 
     def pandoc = @pandoc ||= PandocAdapter.new(runner: @runner, warnings:)
 
-    def normalizer = HtmlNormalizer.new(steps: [HeadingEnsurer.new])
+    def normalizer = HtmlNormalizer.standard
 
-    def warnings = @warnings ||= LenientPolicy.new(@stderr)
+    def warnings = @warnings ||= { false => LenientPolicy, true => StrictPolicy }.fetch(options.strict).new(@stderr)
 
     private
 

@@ -24,6 +24,10 @@ RSpec.describe Bookbind::Wiring do
     expect { wiring_for(inputs: ["a.pdf"]).conversion }.to raise_error(Bookbind::UsageError, /input format '.pdf'/)
   end
 
+  it "fails on warnings with --strict" do
+    expect(wiring_for(strict: true).warnings).to be_a(Bookbind::StrictPolicy)
+  end
+
   it "warns leniently by default" do
     expect(wiring_for.warnings).to be_a(Bookbind::LenientPolicy)
   end

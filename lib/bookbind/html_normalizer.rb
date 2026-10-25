@@ -3,6 +3,8 @@
 module Bookbind
   # Parses HTML, lets each step rewrite it, and returns the body as a Chapter.
   class HtmlNormalizer
+    def self.standard = new(steps: [ImagePathRewriter.new, HeadingEnsurer.new])
+
     def initialize(steps:)
       @steps = steps
     end
