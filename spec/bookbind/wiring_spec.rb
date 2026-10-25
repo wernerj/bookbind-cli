@@ -11,6 +11,10 @@ RSpec.describe Bookbind::Wiring do
     expect(wiring_for.writer).to be_a(Bookbind::EpubWriter)
   end
 
+  it "picks the MOBI writer for mobi" do
+    expect(wiring_for(target: "mobi").writer).to be_a(Bookbind::MobiWriter)
+  end
+
   it "computes the output path from the writer" do
     expect(wiring_for.output).to eq("sample.epub")
   end

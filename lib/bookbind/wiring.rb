@@ -22,6 +22,8 @@ module Bookbind
 
     def pandoc = @pandoc ||= PandocAdapter.new(runner: @runner, warnings:)
 
+    def calibre = @calibre ||= CalibreAdapter.new(runner: @runner)
+
     def normalizer = HtmlNormalizer.standard
 
     def warnings = @warnings ||= { false => LenientPolicy, true => StrictPolicy }.fetch(options.strict).new(@stderr)
